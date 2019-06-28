@@ -145,7 +145,74 @@ The `season_player` dataset only has data on offensive players and didn't tell m
 
 After taking care of all this, I was left with consistent columns accross all of my play-by-play and games `nflscrapR` datasets from each year, so I combined all of these into just two larger datasets, each with a column indicating the dataset that this information initially came from.
 
-With this taken care of, I then began down the path of exploring my data. 
+With this taken care of, I then began down the path of exploring my data. The first thing I wanted to do was get all of the various features into a common frame of reference, so I scaled all of the numeric columns in each of my datasets except for those that were binary using the following User Defined Function (UDF):
 
+```from sklearn import preprocessing
+
+def scale_cols(df, cols, dropna = True):
+    df_copy = df.copy()  # using a copy so changes aren't applied in place for debugging purposes
+    if dropna:
+        # NA values cause problems with scaling and StandardScaler has no way of just ignoring these values
+        # so drop rows with NA values before scaling. They are few and far between so shouldn't be an issue
+        df_copy.dropna(axis = 0, subset = cols,inplace = True)
+        # have to reset the index otherwise later combining becomes an issue
+        df_copy.reset_index(drop = True, inplace = True)
+    temp = df_copy[cols]
+    cols = [col + "_scaled" for col in cols]
+    scaler = preprocessing.StandardScaler()
+    scaled_df = scaler.fit_transform(temp)
+    scaled_df = pd.DataFrame(scaled_df, columns=cols)
+    df_copy[cols] = scaled_df
+    return df_copy
+```
+An important note here is that I still had some null values in the `nflscrapR` play-by-play dataset, and as you can tell my `scale_cols` UDF dropps any rows that contained null values. In all columns except for `air_yards` and `yards_after_catch`, null values were only present in 3.5% of well over 500,000 rows, so I simply applied this to all columns except `air_yards`  and `yards_after_catch`. For these 'problem' columns, I took care of scaling by applying a different UDF that followed essentially the same formula as is used in the `preprocessing.StandardScaler` function from `sklearn`:
+```
+def scale_prob_cols(df, cols):
+    for col in cols:
+        mean = df[col].mean()
+        sd = df[col].std()
+        df[col + '_scaled'] = (df[col] - mean) / sd
+```
+
+With the scaling taken care of, I began further exploring my dataset by visualizing the numeric columns in each using the `distplot` function from the `seaborn` package. I wanted to see the distributions of multiple numeric columns in each individual dataset on the same plot, so I created another UDF:
+```
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+
+
+def multivariable_distplot(df):
+    plt.figure(figsize=(30, 10))
+    for col in df.columns:
+        # only process cols of numeric values that have been scaled
+        if str(df[col].dtype) == 'object' or not col.endswith('scaled'):
+            continue
+        print("Processing column: " + str(col))
+        sns.distplot(df[[col]], label = col, hist = False, rug = True)
+        # add legend with increased size since otherwise too small to easily read
+        plt.legend(prop = {'size': 20})
+```
+Below are some examples of these distribution plots:
+#### Games dataset multivariable_distplot:
+![]()
+
+#### Defensive Rushing multivariable_distplot:
+![]()
+
+#### Safety Statistics multivariable_distplot:
+![]()
+
+These visualizations helped to give me an idea of the distributions of my features, how these distributions compared to one another, and helped to give me ideas for which features might cause issues for a regression model versus which might be good candidates, since regression models typically assume normal distributions.
+
+After that I wanted to get a better idea of how the features in each dataset related to eachother since regression models are sensitive to multicollinearity. So, I decided to generate both correlation matrices and scatter plots from the scaled, numeric columns of each dataset using the following UDF:
+
+```
+from pandas.plotting import scatter_matrix
+def scatter_matrix_scaled_only(df):
+    scaled_cols = [x for x in list(df.columns) if x.endswith('scaled')]
+    temp = df[scaled_cols]
+    display(temp.corr())
+    scatter_matrix(temp, figsize = (15, 15))
+```
 # TODO 
 - add links for notebooks when uploaded
