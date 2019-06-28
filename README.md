@@ -194,13 +194,13 @@ def multivariable_distplot(df):
 ```
 Below are some examples of these distribution plots:
 #### Games dataset multivariable_distplot:
-![]()
+![](visualizations/distplots/home%20score%20vs%20away%20score%20distplot.png)
 
 #### Defensive Rushing multivariable_distplot:
-![]()
+![](visualizations/distplots/defensive%20rushing%20distplot.png)
 
 #### Safety Statistics multivariable_distplot:
-![]()
+![](visualizations/distplots/safeties%20distplot.png)
 
 These visualizations helped to give me an idea of the distributions of my features, how these distributions compared to one another, and helped to give me ideas for which features might cause issues for a regression model versus which might be good candidates, since regression models typically assume normal distributions.
 
@@ -214,5 +214,14 @@ def scatter_matrix_scaled_only(df):
     display(temp.corr())
     scatter_matrix(temp, figsize = (15, 15))
 ```
+Below is an example of the `scatter_matrix_scaled_only` output from the `safeties` dataset:
+![](visualizations/scatter_matrices/cornerbacks%20correlations%20table.png)
+![](visualizations/scatter_matrices/cornerbacks%20scatter%20matrix.png)
+
+From these `scatter_matrix_scaled_only` outputs, I took note of and analyzed the correlation strengths, giving my interpretations of all strong and medium correlations. This helped to give me an idea of what variables I should and should not include in my final models in order to avoid multicolinearity that could easily bias my final model.
+
+## Model Building
+
+
 # TODO 
 - add links for notebooks when uploaded
