@@ -443,6 +443,7 @@ team_scores
 |WAS |1.939287|
 
 Sorting these really tells us a lot more:
+
 |team |score|
 |-----|-----|
 |BAL |-5.280580|
@@ -476,7 +477,7 @@ Sorting these really tells us a lot more:
 |GB |3.722924|
 |TB |4.697601|
 |KC |4.855311|
-|OAK |9.378711|
+|OAK|9.378711|
 
 From the above table, it is clear that the Baltimore Ravens have the strongest defense while the Oakland Raiders have the weakest defense. This tells me that I don't want to pick players from teams that have to play the Ravens a lot, or if one of the players on my fantasy team is playing against the Ravens in any particular week I probably shouldn't play them that week since they are likely to have a tough game. 
 
@@ -540,7 +541,7 @@ plt.figure(figsize = (15, 20))
 # because I want red to indicate a difficult game and blue to indicate an easy game
 sns.heatmap(schedule, cmap = 'coolwarm_r')
 ```
-![]()
+![](visualizations/strength%20of%20schedule%20heatmap.png)
 
 Finally, in order to easily understand which teams have the most difficult versus easiest season overall, I added up the value from each week for each team in order to give them an overall season score:
 ```
